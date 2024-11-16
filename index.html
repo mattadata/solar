@@ -12,7 +12,7 @@
     </style>
 </head>
 <body>
-    <h1>Real-time Solar Dashboard</h1>
+    <h1>Real Time Solar Dashboard</h1>
     <div id="status" class="status">Connecting to MQTT broker...</div>
     <div id="bat_v" class="value">Battery Voltage: -- V</div>
     <div id="watts" class="value">Solar Watts: -- W</div>
@@ -43,13 +43,13 @@
             switch (topic) {
                 case 'my/topic/bat_v':
                     document.getElementById('bat_v').textContent = `Battery Voltage: ${value} V`;
-                    break;
+                   // break;
                 case 'my/topic/watts':
                     document.getElementById('watts').textContent = `Solar Watts: ${value} W`;
-                    break;
+                  //  break;
                 case 'my/topic/battery_power':
                     document.getElementById('battery_power').textContent = `Battery Power: ${value} W`;
-                    break;
+                  //  break;
                 case 'my/topic/soc':
                     document.getElementById('soc').textContent = `State of Charge: ${value} %`;
                     break;

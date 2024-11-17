@@ -90,7 +90,7 @@
                     break;
                 case 'my/topic/soc':
                     socElement.textContent = `State of Charge: ${value} %`;
-                    socElement.className = 'value ' + (value > 80 ? 'good' : value > 50 ? 'warning' : 'danger');
+                    socElement.className = 'value ' + (value > 60 ? 'good' : value > 30 ? 'warning' : 'danger');
                     break;
             }
         });

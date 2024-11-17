@@ -55,6 +55,10 @@
         <div id="watts" class="value">Solar Watts: -- W</div>
         <div id="battery_power" class="value">Battery Power: -- W</div>
         <div id="soc" class="value">State of Charge: -- %</div>
+        <div style="display: flex;">
+            <a href="panel.html" style="margin-right: 20px;">Panel</a>
+            <a href="future.html">Future</a>
+          </div>
     </div>
 
     <script>
@@ -114,11 +118,7 @@
             statusElement.textContent = '❌ Disconnected from MQTT broker';
         });
     </script>
-<br>
-<div style="display: flex;">
-    <a href="panel.html" style="margin-right: 20px;">Panel</a>
-    <a href="future.html">Future</a>
-  </div>
+
 
 </body>
 </html>

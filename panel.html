@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Control Panel</title>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #121212;
+            color: #00ffcc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .panel {
+            background: #1a1a1a;
+            border: 2px solid #00ffcc;
+            border-radius: 15px;
+            padding: 20px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 0 20px #00ffcc;
+        }
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #ffcc00;
+            text-shadow: 0 0 10px #ffcc00;
+            margin-bottom: 20px;
+        }
+        .status {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #ff66cc;
+        }
+        .item {
+            margin: 10px 0;
+            text-align: left;
+        }
+        .label {
+            font-size: 1.1em;
+        }
+        .value {
+            font-size: 1.5em;
+            color: #00ffcc;
+        }
+        .bar {
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .bar-inner {
+            height: 20px;
+            border-radius: 10px;
+        }
+        .battery-bar { background-color: #00ff66; }
+        .solar-bar { background-color: #ffcc00; }
+        .power-bar { background-color: #ff3333; }
+        .soc-bar { background-color: #00ccff; }
+        .status-animation {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <div class="panel">
+        <h1>Solar Control Panel</h1>
+        <div id="status" class="status status-animation">Connecting to MQTT broker...</div>
+
+        <div class="item">
+            <div class="label">Battery Voltage</div>
+            <div id="bat_v" class="value">-- V</div>
+            <div class="bar"><div id="bat_v_bar" class="bar-inner battery-bar" style="width: 0%;"></div></div>
+        </div>
+
+        <div class="item">
+            <div class="label">Solar Watts</div>
+            <div id="watts" class="value">-- W</div>
+            <div class="bar"><div id="watts_bar" class="bar-inner solar-bar" style="width: 0%;"></div></div>
+        </div>
+
+        <div class="item">
+            <div class="label">Battery Power</div>
+            <div id="battery_power" class="value">-- W</div>
+            <div class="bar"><div id="battery_power_bar" class="bar-inner power-bar" style="width: 0%;"></div></div>
+        </div>
+
+        <div class="item">
+            <div class="label">State of Charge</div>
+            <div id="soc" class="value">-- %</div>
+            <div class="bar"><div id="soc_bar" class="bar-inner soc-bar" style="width: 0%;"></div></div>
+        </div>
+    </div>
+
+    <script>
+        const brokerUrl = 'wss://test.mosquitto.org:8081/mqtt';
+        const clientId = 'mqtt-control-panel-' + Math.random().toString(16).slice(2, 8);
+        const client = mqtt.connect(brokerUrl, { clientId });
+
+        const statusElement = document.getElementById('status');
+        const batVElement = document.getElementById('bat_v');
+        const wattsElement = document.getElementById('watts');
+        const batteryPowerElement = document.getElementById('battery_power');
+        const socElement = document.getElementById('soc');
+
+        const batVBar = document.getElementById('bat_v_bar');
+        const wattsBar = document.getElementById('watts_bar');
+        const batteryPowerBar = document.getElementById('battery_power_bar');
+        const socBar = document.getElementById('soc_bar');
+
+        client.on('connect', () => {
+            statusElement.textContent = '🟢 Connected to MQTT broker';
+            console.log('Connected to MQTT broker');
+            client.subscribe('my/topic/#');
+        });
+
+        client.on('message', (topic, message) => {
+            const value = parseFloat(message.toString());
+            switch (topic) {
+                case 'my/topic/bat_v':
+                    batVElement.textContent = `${value.toFixed(2)} V`;
+                    batVBar.style.width = `${Math.min(value / 15 * 100, 100)}%`;
+                    break;
+                case 'my/topic/watts':
+                    wattsElement.textContent = `${value.toFixed(1)} W`;
+                    wattsBar.style.width = `${Math.min(value / 500 * 100, 100)}%`;
+                    break;
+                case 'my/topic/battery_power':
+                    batteryPowerElement.textContent = `${value.toFixed(1)} W`;
+                    batteryPowerBar.style.width = `${Math.min(Math.abs(value) / 500 * 100, 100)}%`;
+                    break;
+                case 'my/topic/soc':
+                    socElement.textContent = `${value.toFixed(0)} %`;
+                    socBar.style.width = `${Math.min(value, 100)}%`;
+                    break;
+            }
+        });
+
+        client.on('error', (error) => {
+            statusElement.textContent = `⚠️ MQTT Error: ${error.message}`;
+        });
+
+        client.on('reconnect', () => {
+            statusElement.textContent = '🔄 Reconnecting to MQTT broker...';
+        });
+
+        client.on('offline', () => {
+            statusElement.textContent = '🔴 MQTT broker is offline';
+        });
+
+        client.on('close', () => {
+            statusElement.textContent = '🔴 Disconnected from MQTT broker';
+        });
+    </script>
+</body>
+</html>

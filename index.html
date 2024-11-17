@@ -31,10 +31,10 @@
             console.log('Connected to MQTT broker');
 
             // Subscribe to your specific topics
-            client.subscribe('my/topic/bat_v');
-            client.subscribe('my/topic/watts');
-            client.subscribe('my/topic/battery_power');
-            client.subscribe('my/topic/soc');
+            //client.subscribe('my/topic/bat_v');
+            //client.subscribe('my/topic/watts');
+            //client.subscribe('my/topic/battery_power');
+            client.subscribe('my/topic/#'); //wildcarding to all topics
         });
 
         client.on('message', (topic, message) => {

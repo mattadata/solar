@@ -84,9 +84,11 @@
                     break;
                 case 'my/topic/watts':
                     wattsElement.textContent = `Solar Watts: ${value} W`;
+                    wattsElement.className = 'value ' + (value > 25 ? 'good' : value > 0 ? 'warning' : 'danger');
                     break;
                 case 'my/topic/battery_power':
                     batteryPowerElement.textContent = `Battery Power: ${value} W`;
+                    batteryPowerElement.className = 'value ' + (value > 0 ? 'good' : value < 0 ? 'warning' : 'danger');
                     break;
                 case 'my/topic/soc':
                     socElement.textContent = `State of Charge: ${value} %`;

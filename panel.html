@@ -135,11 +135,11 @@
                     break;
                 case 'my/topic/watts':
                     wattsElement.textContent = `${value.toFixed(1)} W`;
-                    wattsBar.style.width = `${Math.min(value / 500 * 100, 100)}%`;
+                    wattsBar.style.width = `${Math.min(value / 300 * 100, 100)}%`;
                     break;
                 case 'my/topic/battery_power':
                     batteryPowerElement.textContent = `${value.toFixed(1)} W`;
-                    batteryPowerBar.style.width = `${Math.min(Math.abs(value) / 500 * 100, 100)}%`;
+                    batteryPowerBar.style.width = `${Math.min(Math.abs(value) / 30 * 100, 100)}%`;
                     break;
                 case 'my/topic/soc':
                     socElement.textContent = `${value.toFixed(0)} %`;
@@ -164,6 +164,6 @@
             statusElement.textContent = '🔴 Disconnected from MQTT broker';
         });
     </script>
-    
+
 </body>
 </html>

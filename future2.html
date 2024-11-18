@@ -12,19 +12,22 @@
             background-color: #0d0d0d;
             color: #00ff99;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
         }
         .dashboard {
-    background: rgba(0, 0, 0, 0.7);
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 0 20px 10px #00ff99; /* Added a spread radius */
-    overflow: visible; /* Ensures shadow is not clipped */
-}
-
+            position: relative;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px #00ff99;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
         h1 {
             font-size: 2em;
             margin-bottom: 20px;
@@ -42,9 +45,9 @@
             margin: 15px 0;
             color: #00ff99;
         }
-        .good { color: #00ff99; } /* Neon Green */
-        .warning { color: #ffcc00; } /* Yellow */
-        .danger { color: #ff3333; } /* Red */
+        .good { color: #00ff99; }
+        .warning { color: #ffcc00; }
+        .danger { color: #ff3333; }
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -56,13 +59,32 @@
             border-radius: 10px;
             box-shadow: 0 0 10px #00ff99;
         }
-        .status-animation {
-            animation: pulse 1.5s infinite;
+        .energy-flow-container {
+            margin-top: 20px;
+            width: 300px;
+            height: 120px;
+            display: none;
         }
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
+        .wire {
+            stroke: #00ff99;
+            stroke-width: 3;
+            fill: none;
+        }
+        .flow {
+            stroke: #ffcc00;
+            stroke-width: 2;
+            stroke-dasharray: 5;
+            animation: flow 1s linear infinite;
+        }
+        .solar-panel-icon {
+            fill: #00e0e0;
+        }
+        .battery-icon {
+            fill: #00ff99;
+        }
+        @keyframes flow {
+            0% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -20; }
         }
     </style>
 </head>
@@ -78,6 +100,25 @@
         </div>
     </div>
 
+    <!-- Energy Flow Animation -->
+    <div id="energyFlowContainer" class="energy-flow-container">
+        <svg viewBox="0 0 300 120">
+            <!-- Solar Panel Icon -->
+            <rect x="20" y="40" width="30" height="30" class="solar-panel-icon" />
+            <line x1="25" y1="45" x2="45" y2="65" stroke="#00e0e0" stroke-width="2" />
+            <line x1="45" y1="45" x2="25" y2="65" stroke="#00e0e0" stroke-width="2" />
+
+            <!-- Wire Path -->
+            <path class="wire" d="M50 55 L150 55 L150 85 L250 85" />
+            <!-- Energy Flow Animation -->
+            <path class="flow" d="M50 55 L150 55 L150 85 L250 85" />
+
+            <!-- Battery Icon -->
+            <rect x="240" y="70" width="25" height="40" class="battery-icon" />
+            <rect x="264" y="80" width="5" height="20" class="battery-icon" />
+        </svg>
+    </div>
+
     <script>
         const brokerUrl = 'wss://test.mosquitto.org:8081/mqtt';
         const clientId = 'mqtt-dashboard-' + Math.random().toString(16).slice(2, 8);
@@ -88,6 +129,7 @@
         const wattsElement = document.getElementById('watts');
         const batteryPowerElement = document.getElementById('battery_power');
         const socElement = document.getElementById('soc');
+        const energyFlowContainer = document.getElementById('energyFlowContainer');
 
         client.on('connect', () => {
             statusElement.textContent = '🟢 Connected to MQTT broker';
@@ -102,34 +144,34 @@
             switch (topic) {
                 case 'my/topic/bat_v':
                     batVElement.textContent = `Battery Voltage: ${value.toFixed(2)} V`;
-                    batVElement.className = 'item value ' + (value > 12 ? 'good' : value > 11 ? 'warning' : 'danger');
                     break;
                 case 'my/topic/watts':
                     wattsElement.textContent = `Solar Watts: ${value.toFixed(1)} W`;
                     break;
                 case 'my/topic/battery_power':
                     batteryPowerElement.textContent = `Battery Power: ${value.toFixed(1)} W`;
+                    if (value > 0) {
+                        energyFlowContainer.style.display = 'block';
+                    } else {
+                        energyFlowContainer.style.display = 'none';
+                    }
                     break;
                 case 'my/topic/soc':
                     socElement.textContent = `State of Charge: ${value.toFixed(0)} %`;
-                    socElement.className = 'item value ' + (value > 80 ? 'good' : value > 50 ? 'warning' : 'danger');
                     break;
             }
         });
 
         client.on('error', (error) => {
             statusElement.textContent = `⚠️ MQTT Error: ${error.message}`;
-            statusElement.style.color = '#ff3333';
         });
 
         client.on('reconnect', () => {
             statusElement.textContent = '🔄 Reconnecting to MQTT broker...';
-            statusElement.style.color = '#ffcc00';
         });
 
         client.on('offline', () => {
             statusElement.textContent = '🔴 MQTT broker is offline';
-            statusElement.style.color = '#ff3333';
         });
 
         client.on('close', () => {

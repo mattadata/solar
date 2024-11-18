@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Solar Power System Data</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 1em 0;
+            width: 100%;
+        }
+        main {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .data-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+            padding: 15px;
+            width: 90%;
+            max-width: 300px;
+        }
+        .data-item h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Solar Power System Data</h1>
+</header>
+
+<main>
+    <div class="data-item" id="bat_v">
+        <h3>Bat Voltage (V)</h3>
+        <p id="value_bat_v">Loading...</p>
+    </div>
+    <div class="data-item" id="battery_power">
+        <h3>Battery Power (W)</h3>
+        <p id="value_battery_power">Loading...</p>
+    </div>
+    <div class="data-item" id="soc">
+        <h3>State of Charge (%)</h3>
+        <p id="value_soc">Loading...</p>
+    </div>
+    <div class="data-item" id="watts">
+        <h3>Power (W)</h3>
+        <p id="value_watts">Loading...</p>
+    </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    // Create a client instance
+    const client = new Paho.MQTT.Client("test.mosquitto.org", 8081, "myClient");
+
+    // Set callback handlers
+    client.onConnectionLost = onConnectionLost;
+    client.onMessageArrived = onMessageArrived;
+
+    // Connect to the broker
+    client.connect({ onSuccess: onConnect });
+
+    function onConnect() {
+        console.log("Connected to MQTT Broker");
+        // Subscribe to specific topics
+        client.subscribe("my/topic/#");
+
+    }
+
+    function onConnectionLost(responseObject) {
+        if (responseObject.errorCode !== 0) {
+            console.log("onConnectionLost:" + responseObject.errorMessage);
+        }
+    }
+
+    function onMessageArrived(message) {
+        const topic = message.destinationName;
+        const payload = message.payloadString;
+        console.log("topic is:",topic)
+        console.log("payload is:",payload)
+
+        // Update the corresponding HTML elements
+        
+        switch (topic) {
+            case "my/topic/bat_v":
+                document.getElementById('value_bat_v').textContent = payload + ' V';
+                break;
+            case "my/topic/battery_power":
+                document.getElementById('value_battery_power').textContent = payload + ' W';
+                break;
+            case "my/topic/soc":
+                document.getElementById('value_soc').textContent = payload + '%';
+                break;
+            case "my/topic/watts":
+                document.getElementById('value_watts').textContent = payload + '';
+                break;
+            default:
+                console.log("Unhandled topic:", topic);
+        }
+    }
+</script>
+
+</body>
+</html>

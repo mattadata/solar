@@ -2,6 +2,7 @@ import asyncio
 import signal
 import gmqtt
 import json
+import math
 
 BROKER_ADDRESS_READ = '192.168.1.244'
 #BROKER_ADDRESS_PUBLISH = 'localhost'
@@ -14,12 +15,14 @@ DC_LOAD_A = 'N/b827eb3be7e4/solarcharger/288/Dc/0/Current'
 DC_LOAD_V = 'N/b827eb3be7e4/solarcharger/288/Dc/0/Voltage'
 #SHUNT = 'N/b827eb3be7e4/system/0/Batteries'        #old way. worked, but didn't update as frequent
 SHUNT  = 'N/b827eb3be7e4/system/0/Dc/Battery/Power' #new way seems to update quicker
+TIMETOGO = 'N/b827eb3be7e4/system/0/Dc/Battery/TimeToGo' #number of seconds of battery life left based on current solar input
 
-PUBLISH_TOPIC = 'my/topic/watts'
-PUBLISH_TOPIC_SOC = 'my/topic/soc'
-PUBLISH_TOPIC_BAT_V = 'my/topic/bat_v'
-PUBLISH_TOPIC_LOAD_A = 'my/topic/load_a'
+PUBLISH_TOPIC           = 'my/topic/watts'
+PUBLISH_TOPIC_SOC       = 'my/topic/soc'
+PUBLISH_TOPIC_BAT_V     = 'my/topic/bat_v'
+PUBLISH_TOPIC_LOAD_A    = 'my/topic/load_a'
 PUBLISH_TOPIC_BAT_POWER = 'my/topic/battery_power'
+PUBLISH_TIME_TO_GO      = 'my/topic/time_to_go'
 KEEPALIVE_INTERVAL = 55  # seconds
 
 STOP = asyncio.Event()
@@ -30,6 +33,7 @@ def on_connect_read(client, flags, rc, properties):
     client.subscribe(SOC_TOPIC)
     client.subscribe(BATTERY_VOLTS_TOPIC)
     client.subscribe(SHUNT)
+    client.subscribe(TIMETOGO)
 def on_connect_publish(client, flags, rc, properties):
     print('Connected to publish broker')
 
@@ -81,7 +85,22 @@ def on_message(client, topic, payload, qos, properties):
             #print(f"Received: {data}, Published battery power: {battery_power}")
         except (ValueError, json.JSONDecodeError) as e:
             print(f"Invalid payload: {payload}, Error: {e}")
-            
+    elif topic == TIMETOGO:
+        try:
+            data = json.loads(payload.decode('utf-8'))  # Decode the payload from bytes to string and parse JSON
+            time_to_go = float(data.get('value', 0))  # Extract the 'value' field and convert to float
+            time_to_go = round(time_to_go,2)            
+            # Convert to hours and minutes
+            hours = math.floor(time_to_go / 3600)  # Get the whole number of hours
+            minutes = math.floor((time_to_go % 3600) / 60)  # Get the remaining minutes
+            # Format the result
+            formatted_time = f"{hours}h {minutes}m"
+            publish_client.publish(PUBLISH_TIME_TO_GO, str(formatted_time), qos=0, retain=True) 
+            print(f"Received: {data}, Published time to go: {formatted_time}")
+        except (ValueError, json.JSONDecodeError) as e:
+            print(f"Invalid payload: {payload}, Error: {e}")
+
+
 def on_disconnect(client, packet, exc=None):
     print('Disconnected')
 

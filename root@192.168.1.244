@@ -73,10 +73,9 @@ def on_message(client, topic, payload, qos, properties):
     elif topic == SHUNT:
         try:
             data = json.loads(payload.decode('utf-8'))  # Decode the payload from bytes to string and parse JSON
-            #battery_info = data["value"][0]
-            #battery_power = round(float(battery_info.get("power", 0))  ,0)
-            battery_power = float(data.get('value', 0))  # Extract the 'value' field and convert to float
-            battery_power = round(battery_power,2)            
+            battery_info = data["value"][0]
+            battery_power = round(float(battery_info.get("power", 0))  ,0)
+                      #load_a = round(load_a,2)
             publish_client.publish(PUBLISH_TOPIC_BAT_POWER, str(battery_power), qos=0, retain=True)
             #print(f"Received: {data}, Published battery power: {battery_power}")
         except (ValueError, json.JSONDecodeError) as e:

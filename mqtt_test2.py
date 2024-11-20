@@ -12,7 +12,8 @@ SOC_TOPIC = 'N/b827eb3be7e4/system/0/Dc/Battery/Soc'
 BATTERY_VOLTS_TOPIC = 'N/b827eb3be7e4/system/0/Dc/Battery/Voltage'
 DC_LOAD_A = 'N/b827eb3be7e4/solarcharger/288/Dc/0/Current'
 DC_LOAD_V = 'N/b827eb3be7e4/solarcharger/288/Dc/0/Voltage'
-SHUNT = 'N/b827eb3be7e4/system/0/Batteries'
+#SHUNT = 'N/b827eb3be7e4/system/0/Batteries'        #old way. worked, but didn't update as frequent
+SHUNT  = 'N/b827eb3be7e4/system/0/Dc/Battery/Power' #new way seems to update quicker
 
 PUBLISH_TOPIC = 'my/topic/watts'
 PUBLISH_TOPIC_SOC = 'my/topic/soc'

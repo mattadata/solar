@@ -84,14 +84,10 @@
     </div>
 
     <script>
-        const brokerUrl = "wss://14c25b0e91f540059e4503c11ccfc962.s1.eu.hivemq.cloud:8884/mqtt"; // WebSocket secure URL
-        const options = {
-            username: "mqtt_read", // Your HiveMQ username
-            password: "RpwteG#r3fq2FC", // Your HiveMQ password
-            clientId: "web-client-" + Math.random().toString(16).substring(2, 8), // Unique client ID
-            clean: true // Start with a clean session
-        };
-        const client = mqtt.connect(brokerUrl, options);
+        const brokerUrl = 'wss://test.mosquitto.org:8081/mqtt'; 
+        // const brokerUrl = '14c25b0e91f540059e4503c11ccfc962.s1.eu.hivemq.cloud:8884/mqtt'; 
+        const clientId = 'mqtt-dashboard-' + Math.random().toString(16).slice(2, 8);
+        const client = mqtt.connect(brokerUrl, { clientId });
 
         const statusElement = document.getElementById('status');
         const batVElement = document.getElementById('bat_v');
@@ -100,7 +96,7 @@
         const socElement = document.getElementById('soc');
 
         client.on('connect', () => {
-            statusElement.textContent = '🟢 Connected to Hive MQTT broker';
+            statusElement.textContent = '🟢 Connected to MQTT broker';
             statusElement.style.color = '#00ff99';
             console.log('Connected to MQTT broker');
             client.subscribe('my/topic/#');

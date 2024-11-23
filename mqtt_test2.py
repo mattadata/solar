@@ -1,3 +1,6 @@
+# push from terminal app to Rpi from Terminal
+# scp /Users/mattangelo/Documents/solar/mqtt_test2.py root@192.168.1.244:/home/root/
+
 import asyncio
 import signal
 import gmqtt
@@ -89,15 +92,12 @@ def on_message(client, topic, payload, qos, properties):
         try:
             data = json.loads(payload.decode('utf-8'))  # Decode the payload from bytes to string and parse JSON
             time_to_go = float(data.get('value', 0))  # Extract the 'value' field and convert to float
-            time_to_go = round(time_to_go,2)   
-                     
-            # Convert to days, hours, and minutes
-            days = time_to_go // 86400  # Integer division for days (86400 seconds in a day)
-            hours = (time_to_go % 86400) // 3600  # Remaining hours
-            minutes = (time_to_go % 3600) // 60  # Remaining minutes
+            time_to_go = round(time_to_go,2)            
+            # Convert to hours and minutes
+            hours = math.floor(time_to_go / 3600)  # Get the whole number of hours
+            minutes = math.floor((time_to_go % 3600) / 60)  # Get the remaining minutes
             # Format the result
-            formatted_time = f"{days}d {hours}h {minutes}m"
-
+            formatted_time = f"{hours}h {minutes}m"
             publish_client.publish(PUBLISH_TIME_TO_GO, str(formatted_time), qos=0, retain=True) 
             print(f"Received: {data}, Published time to go: {formatted_time}")
         except (ValueError, json.JSONDecodeError) as e:

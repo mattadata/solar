@@ -84,8 +84,8 @@
     </div>
 
     <script>
-        /*const brokerUrl = 'wss://test.mosquitto.org:8081/mqtt'; */
-        const brokerUrl = 'wss://14c25b0e91f540059e4503c11ccfc962.s1.eu.hivemq.cloud:8884/mqtt'; 
+        const brokerUrl = 'wss://test.mosquitto.org:8081/mqtt'; 
+        // const brokerUrl = '14c25b0e91f540059e4503c11ccfc962.s1.eu.hivemq.cloud:8884/mqtt'; 
         const clientId = 'mqtt-dashboard-' + Math.random().toString(16).slice(2, 8);
         const client = mqtt.connect(brokerUrl, { clientId });
 

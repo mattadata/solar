@@ -1,56 +1,69 @@
-import asyncio
-import signal
-import gmqtt
-import json
-import math
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT Web Client</title>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+</head>
+<body>
+    <h1>MQTT Web Client</h1>
+    <div>
+        <p>Status: <span id="status">Disconnected</span></p>
+        <p>Messages:</p>
+        <ul id="messages"></ul>
+    </div>
 
-# HiveMQ Cloud Broker Details
-BROKER_ADDRESS_PUBLISH = '14c25b0e91f540059e4503c11ccfc962.s1.eu.hivemq.cloud'
-BROKER_PORT = 8883  # Secure MQTT port
-PUBLISH_USERNAME = 'mqtt_publish_user'
-PUBLISH_PASSWORD = 'UR9XVEXA*%X*4k'
+    <script>
+        // Broker details
+        const brokerUrl = "wss://14c25b0e91f540059e4503c11ccfc962.s1.eu.hivemq.cloud:8884/mqtt"; // WebSocket secure URL
+        const options = {
+            username: "mqtt_publish_user", // Your HiveMQ username
+            password: "your-password-here", // Your HiveMQ password
+            clientId: "web-client-" + Math.random().toString(16).substring(2, 8), // Unique client ID
+            clean: true // Start with a clean session
+        };
 
-PUBLISH_TOPIC = 'my/topic/watts'
-KEEPALIVE_INTERVAL = 55  # seconds
+        // Connect to the broker
+        const client = mqtt.connect(brokerUrl, options);
 
-STOP = asyncio.Event()
+        // Connection event handlers
+        const statusElement = document.getElementById("status");
+        const messagesElement = document.getElementById("messages");
 
-def on_connect_publish(client, flags, rc, properties):
-    print('Connected to publish broker')
+        client.on("connect", () => {
+            statusElement.textContent = "Connected";
+            console.log("Connected to broker");
 
-def on_disconnect(client, packet, exc=None):
-    print('Disconnected')
+            // Subscribe to a topic
+            client.subscribe("my/topic/watts", (err) => {
+                if (err) {
+                    console.error("Subscription error:", err);
+                } else {
+                    console.log("Subscribed to topic");
+                }
+            });
 
-async def keepalive_message(client):
-    while not STOP.is_set():
-        client.publish(PUBLISH_TOPIC, 'keepalive', qos=0)
-        await asyncio.sleep(KEEPALIVE_INTERVAL)
+            // Publish a test message (optional)
+            client.publish("my/topic/watts", "Hello from HTML!");
+        });
 
-def ask_exit(*args):
-    STOP.set()
+        client.on("message", (topic, payload) => {
+            console.log(`Received message on ${topic}: ${payload.toString()}`);
+            const li = document.createElement("li");
+            li.textContent = `Topic: ${topic}, Message: ${payload}`;
+            messagesElement.appendChild(li);
+        });
 
-async def main():
-    global publish_client
+        client.on("error", (err) => {
+            console.error("Connection error:", err);
+            statusElement.textContent = "Error";
+        });
 
-    # Client for publishing
-    publish_client = gmqtt.Client("publish-client-id")
-    publish_client.on_connect = on_connect_publish
-    publish_client.on_disconnect = on_disconnect
-
-    # Set authentication
-    publish_client.set_auth_credentials(PUBLISH_USERNAME, PUBLISH_PASSWORD)
-
-    # Connect to the HiveMQ Cloud broker
-    await publish_client.connect(BROKER_ADDRESS_PUBLISH, port=BROKER_PORT, ssl=True)
-
-    # Publish keepalive messages
-    asyncio.create_task(keepalive_message(publish_client))
-
-    await STOP.wait()
-    await publish_client.disconnect()
-
-if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    for sig in ('SIGINT', 'SIGTERM'):
-        loop.add_signal_handler(getattr(signal, sig), ask_exit)
-    loop.run_until_complete(main())
+        client.on("close", () => {
+            console.log("Disconnected");
+            statusElement.textContent = "Disconnected";
+        });
+    </script>
+</body>
+</html>

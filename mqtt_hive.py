@@ -1,5 +1,5 @@
 # push from terminal app to Rpi from Terminal
-# scp /Users/mattangelo/Documents/solar/mqtt_test2.py root@192.168.1.244:/home/root/
+# scp /Users/mattangelo/Documents/solar/mqtt_hive.py root@192.168.1.244:/home/root/
 
 import asyncio
 import signal

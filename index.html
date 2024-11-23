@@ -100,7 +100,7 @@
         const socElement = document.getElementById('soc');
 
         client.on('connect', () => {
-            statusElement.textContent = '🟢 Connected to Hive MQTT broker';
+            statusElement.textContent = '🟢 Connected to MQTT broker';
             statusElement.style.color = '#00ff99';
             console.log('Connected to MQTT broker');
             client.subscribe('my/topic/#');

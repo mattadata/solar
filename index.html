@@ -131,10 +131,15 @@
             }
         });
 
-        client.on('error', (error) => {
-            statusElement.textContent = `⚠️ MQTT Error: ${error.message}`;
-            statusElement.style.color = '#ff3333';
+                // Log connection errors
+                client.on('error', (err) => {
+            console.error("Error during connection:", err);
+            document.getElementById("status").textContent = "Error: " + err.message;
         });
+
+
+
+
 
         client.on('reconnect', () => {
             statusElement.textContent = '🔄 Reconnecting to MQTT broker...';

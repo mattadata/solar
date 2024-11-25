@@ -119,6 +119,7 @@
                     break;
                 case 'my/topic/battery_power':
                     batteryPowerElement.textContent = `Battery Power: ${value.toFixed(1)} W`;
+                    batteryPowerElement.className = 'item value ' + (value > 0 ? 'good' : value < 0 ? 'warning' : 'danger');
                     break;
                 case 'my/topic/soc':
                     socElement.textContent = `State of Charge: ${value.toFixed(0)} %`;

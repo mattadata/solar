@@ -6,6 +6,8 @@ import signal
 import gmqtt
 import json
 import math
+#import logging
+#logging.basicConfig(level=logging.DEBUG)
 
 BROKER_ADDRESS_READ = '192.168.1.244'
 KEEPALIVE_TOPIC = 'R/b827eb3be7e4/keepalive'
@@ -32,6 +34,7 @@ PUBLISH_TOPIC_BAT_POWER = 'my/topic/battery_power'
 PUBLISH_TIME_TO_GO      = 'my/topic/time_to_go'
 KEEPALIVE_INTERVAL = 55  # seconds
 
+
 STOP = asyncio.Event()
 
 def on_connect_read(client, flags, rc, properties):
@@ -51,7 +54,7 @@ def on_message(client, topic, payload, qos, properties):
             power_value = float(data.get('value', 0))  # Extract the 'value' field and convert to float
             truncated_value = int(power_value)
             publish_client.publish(PUBLISH_TOPIC, str(truncated_value), qos=0, retain=True)
-            print(f"Received: {data}, Published: {truncated_value}")
+            print(f"Received Watts: {data}, Published: {truncated_value}")
         except (ValueError, json.JSONDecodeError) as e:
             print(f"Invalid payload: {payload}, Error: {e}")
     elif topic == SOC_TOPIC:
@@ -60,7 +63,7 @@ def on_message(client, topic, payload, qos, properties):
             soc_value = float(data.get('value', 0))  # Extract the 'value' field and convert to float
             truncated_value = int(soc_value)
             publish_client.publish(PUBLISH_TOPIC_SOC, str(truncated_value), qos=0, retain=True)
-            print(f"Received: {data}, Published: {truncated_value}")
+            print(f"Received SOC: {data}, Published: {truncated_value}")
         except (ValueError, json.JSONDecodeError) as e:
             print(f"Invalid payload: {payload}, Error: {e}")
     elif topic == BATTERY_VOLTS_TOPIC:
@@ -69,7 +72,7 @@ def on_message(client, topic, payload, qos, properties):
             bat_v = float(data.get('value', 0))  # Extract the 'value' field and convert to float
             bat_v = round(bat_v,2)
             publish_client.publish(PUBLISH_TOPIC_BAT_V, str(bat_v), qos=0, retain=True)
-            print(f"Received: {data}, Published: {bat_v}")
+            print(f"Received Volts: {data}, Published: {bat_v}")
         except (ValueError, json.JSONDecodeError) as e:
             print(f"Invalid payload: {payload}, Error: {e}")
     elif topic == DC_LOAD_A:
@@ -78,7 +81,7 @@ def on_message(client, topic, payload, qos, properties):
             load_a = float(data.get('value', 0))  # Extract the 'value' field and convert to float
             load_a = round(load_a,2)
             publish_client.publish(PUBLISH_TOPIC_LOAD_A, str(load_a), qos=0, retain=True)
-            print(f"Received: {data}, Published Load Amps: {load_a}")
+            print(f"Received Amps: {data}, Published Load Amps: {load_a}")
         except (ValueError, json.JSONDecodeError) as e:
             print(f"Invalid payload: {payload}, Error: {e}")
     elif topic == SHUNT:
@@ -89,21 +92,27 @@ def on_message(client, topic, payload, qos, properties):
             battery_power = float(data.get('value', 0))  # Extract the 'value' field and convert to float
             battery_power = round(battery_power,2)            
             publish_client.publish(PUBLISH_TOPIC_BAT_POWER, str(battery_power), qos=0, retain=True)
-            #print(f"Received: {data}, Published battery power: {battery_power}")
+            print(f"Received B_power: {data}, Published battery power: {battery_power}")
         except (ValueError, json.JSONDecodeError) as e:
             print(f"Invalid payload: {payload}, Error: {e}")
     elif topic == TIMETOGO:
         try:
             data = json.loads(payload.decode('utf-8'))  # Decode the payload from bytes to string and parse JSON
-            time_to_go = float(data.get('value', 0))  # Extract the 'value' field and convert to float
-            time_to_go = round(time_to_go,2)            
-            # Convert to hours and minutes
-            hours = math.floor(time_to_go / 3600)  # Get the whole number of hours
-            minutes = math.floor((time_to_go % 3600) / 60)  # Get the remaining minutes
-            # Format the result
-            formatted_time = f"{hours}h {minutes}m"
+            value = data.get('value')
+            if value is None:
+                formatted_time = "∞"  # Display infinity symbol if value is null
+            else:
+                # Convert the value to float, round, and process it
+                time_to_go = round(float(value), 2)
+    
+                # Convert to hours and minutes
+                hours = math.floor(time_to_go / 3600)  # Get the whole number of hours
+                minutes = math.floor((time_to_go % 3600) / 60)  # Get the remaining minutes
+    
+                # Format the result
+                formatted_time = f"{hours}h {minutes}m"
             publish_client.publish(PUBLISH_TIME_TO_GO, str(formatted_time), qos=0, retain=True) 
-            print(f"Received: {data}, Published time to go: {formatted_time}")
+            print(f"Received TTGO: {data}, Published time to go: {formatted_time}")
         except (ValueError, json.JSONDecodeError) as e:
             print(f"Invalid payload: {payload}, Error: {e}")
 
@@ -133,9 +142,18 @@ async def main():
     read_client.on_subscribe = on_subscribe
 
     # Client for publishing
-    publish_client = gmqtt.Client("publish-client-id")
+    # Set Last Will directly using the will_message attribute --doesn't seem like it gets called
+    will_message = gmqtt.Message(
+        topic=PUBLISH_TIME_TO_GO,
+        payload="Not Publishing!",
+        qos=1,  # Quality of Service level (0, 1, or 2)
+        retain=True  # Retain flag
+    )
+    publish_client = gmqtt.Client("publish-client-id",will_message=will_message)
     publish_client.on_connect = on_connect_publish
     publish_client.on_disconnect = on_disconnect
+
+
 
     # Set authentication
     publish_client.set_auth_credentials(PUBLISH_USERNAME, PUBLISH_PASSWORD)

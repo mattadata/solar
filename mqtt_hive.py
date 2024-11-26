@@ -53,6 +53,8 @@ def on_message(client, topic, payload, qos, properties):
             data = json.loads(payload.decode('utf-8'))  # Decode the payload from bytes to string and parse JSON
             power_value = float(data.get('value', 0))  # Extract the 'value' field and convert to float
             truncated_value = int(power_value)
+            if -2 <= truncated_value <= 2:
+                truncated_value = 0.0
             publish_client.publish(PUBLISH_TOPIC, str(truncated_value), qos=0, retain=True)
             print(f"Received Watts: {data}, Published: {truncated_value}")
         except (ValueError, json.JSONDecodeError) as e:

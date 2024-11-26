@@ -122,7 +122,7 @@
                     batteryPowerElement.className = 'item value ' + (value > 0 ? 'good' : value < 0 ? 'warning' : 'danger');
                     break;
                 case 'my/topic/soc':
-                    socElement.textContent = `State of Charge: ${value.toFixed(0)} %`;
+                    socElement.textContent = `State of Charge: ${value.toFixed(2)} %`;
                     socElement.className = 'item value ' + (value > 80 ? 'good' : value > 50 ? 'warning' : 'danger');
                     break;
                 case 'my/topic/time_to_go':

@@ -63,7 +63,7 @@ def on_message(client, topic, payload, qos, properties):
         try:
             data = json.loads(payload.decode('utf-8'))  # Decode the payload from bytes to string and parse JSON
             soc_value = float(data.get('value', 0))  # Extract the 'value' field and convert to float
-            truncated_value = round(soc_value, 3)
+            truncated_value = round(soc_value, 5)
             publish_client.publish(PUBLISH_TOPIC_SOC, str(truncated_value), qos=0, retain=True)
             print(f"Received SOC: {data}, Published: {truncated_value}")
         except (ValueError, json.JSONDecodeError) as e:

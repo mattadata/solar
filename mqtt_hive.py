@@ -9,7 +9,7 @@ import math
 #import logging
 #logging.basicConfig(level=logging.DEBUG)
 
-BROKER_ADDRESS_READ = '192.168.1.244'
+BROKER_ADDRESS_READ = 'raspberrypi2'
 KEEPALIVE_TOPIC = 'R/b827eb3be7e4/keepalive'
 PV_WATTS_TOPIC = 'N/b827eb3be7e4/system/0/Dc/Pv/Power'
 SOC_TOPIC = 'N/b827eb3be7e4/system/0/Dc/Battery/Soc'

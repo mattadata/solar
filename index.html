@@ -124,12 +124,13 @@
                     batteryPowerElement.className = 'item value ' + (value > 0 ? 'good' : value < 0 ? 'warning' : 'danger');
 
                     const timeToFullElement = document.getElementById('time_to_full');
+                    
                     if (value <= 0) 
                         {TTF = 0}
                       else if (value > 0)
                         {TTF =  (100-last_SOC) / 100 * 1280  / message;}
                       else {TTF = 0}
-                    timeToFullElement.textContent = 'Time to Full Hours:' +  TTF;
+                    timeToFullElement.textContent = 'Time to Full Hours: ' +  TTF.toFixed(2);
 
                     break;
                 case 'my/topic/soc':

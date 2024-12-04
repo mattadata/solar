@@ -99,7 +99,7 @@
         const wattsElement = document.getElementById('watts');
         const batteryPowerElement = document.getElementById('battery_power');
         const socElement = document.getElementById('soc');
-        const last_SOC = '5';
+        last_SOC = 5;
 
         client.on('connect', () => {
             statusElement.textContent = '🟢 Connected to MQTT broker';

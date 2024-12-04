@@ -130,7 +130,7 @@
                 case 'my/topic/soc':
                     socElement.textContent = `State of Charge: ${value.toFixed(2)} %`;
                     socElement.className = 'item value ' + (value > 80 ? 'good' : value > 50 ? 'warning' : 'danger');
-                    last_SOC = '${value.toFixed(2)}';
+                    last_SOC = ${value.toFixed(2)};
                     break;
                 case 'my/topic/time_to_go':
                     const timeToGoElement = document.getElementById('time_to_go');

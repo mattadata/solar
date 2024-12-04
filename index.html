@@ -80,7 +80,7 @@
             <div id="battery_power" class="item value">Battery Power: -- W</div>
             <div id="soc" class="item value">State of Charge: -- %</div>
         </div>
-        <div id="time_to_go"     class="item value" style="color: blue;">Time to Go: --</div>
+        <div id="time_to_go"     class="item value" style="color: blue;">Time to Empty: --</div>
         <div id="time_to_full"   class="item value" style="color: blue;">Time to Full: --</div>
     </div>
 
@@ -140,7 +140,7 @@
                     break;
                 case 'my/topic/time_to_go':
                     const timeToGoElement = document.getElementById('time_to_go');
-                    timeToGoElement.textContent = `Time to Go: ${message.toString()}`;
+                    timeToGoElement.textContent = `Time to Empty: ${message.toString()}`;
                     break;
             }
         });

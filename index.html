@@ -124,7 +124,7 @@
                     batteryPowerElement.className = 'item value ' + (value > 0 ? 'good' : value < 0 ? 'warning' : 'danger');
 
                     const timeToFullElement = document.getElementById('time_to_full');
-                    timeToFullElement.textContent = `Time to Full W: ${message.toString()}  ${last_SOC} ` ;
+                    timeToFullElement.textContent = 'Time to Full W:' + 3*2;      //${message.toString()}  ${last_SOC} ` ;
 
                     break;
                 case 'my/topic/soc':

@@ -23,6 +23,9 @@ try:
     response.raise_for_status()  # Raise an exception for HTTP errors
     data = response.json()
 
+    # Print the number of products in the search results
+    print(f"Number of products found: {len(data.get('search_results', []))}")
+
     # Extract the relevant information for each product
     products = []
     for product in data.get('search_results', []):
@@ -40,7 +43,7 @@ try:
         products.append([brand, voltage, price, title, link])
     
     # Write the data to a CSV file
-    csv_file = 'lifepo4_products_filtered.csv'
+    csv_file = 'lifepo4_products_filtered2.csv'
     with open(csv_file, mode='w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(['Brand', 'Voltage', 'Price', 'Title', 'Link'])  # Header

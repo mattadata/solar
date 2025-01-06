@@ -16,7 +16,7 @@ def extract_voltage(title):
     """Extract voltage from the product title."""
     match = re.search(r'\b(12V|24V|36V|48V)\b', title)
     return match.group(0) if match else 'N/A'
-
+ 
 # Make the HTTP GET request to ASIN Data API
 try:
     response = requests.get('https://api.asindataapi.com/request', params=params)
@@ -43,7 +43,7 @@ try:
         products.append([brand, voltage, price, title, link])
     
     # Write the data to a CSV file
-    csv_file = 'lifepo4_products_filtered2.csv'
+    csv_file = 'lifepo4_products_filtered3.csv'
     with open(csv_file, mode='w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(['Brand', 'Voltage', 'Price', 'Title', 'Link'])  # Header

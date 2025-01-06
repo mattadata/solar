@@ -128,7 +128,7 @@
                     if (value <= 0) 
                         {TTF = 0}
                       else if (value > 0)
-                        {TTF =  (100-last_SOC) / 100 * 1280  / message;}
+                        {TTF =  (100-last_SOC) / 100 * 5120  / message;} // 5120 is the battery capacity in Wh
                       else {TTF = 0}
                     timeToFullElement.textContent = 'Time to Full Hours: ' +  TTF.toFixed(2);
 

@@ -15,7 +15,8 @@ PV_WATTS_TOPIC = 'N/b827eb3be7e4/system/0/Dc/Pv/Power'
 SOC_TOPIC = 'N/b827eb3be7e4/system/0/Dc/Battery/Soc'
 BATTERY_VOLTS_TOPIC = 'N/b827eb3be7e4/system/0/Dc/Battery/Voltage'
 DC_LOAD_A = 'N/b827eb3be7e4/solarcharger/288/Dc/0/Current'
-DC_LOAD_V = 'N/b827eb3be7e4/solarcharger/288/Dc/0/Voltage'
+DC_LOAD_V = 'N/b827eb3be7e4/solarcharger/288/Dc/0/Voltage' 
+AC_INV_W  = 'N/b827eb3be7e4/inverter/290/Ac/Out/L1/S' #not used yet. Just put path here
 #SHUNT = 'N/b827eb3be7e4/system/0/Batteries'        #old way. worked, but didn't update as frequent
 SHUNT  = 'N/b827eb3be7e4/system/0/Dc/Battery/Power' #new way seems to update quicker
 TIMETOGO = 'N/b827eb3be7e4/system/0/Dc/Battery/TimeToGo' #number of seconds of battery life left based on current solar input
@@ -32,6 +33,7 @@ PUBLISH_TOPIC_BAT_V     = 'my/topic/bat_v'
 PUBLISH_TOPIC_LOAD_A    = 'my/topic/load_a'
 PUBLISH_TOPIC_BAT_POWER = 'my/topic/battery_power'
 PUBLISH_TIME_TO_GO      = 'my/topic/time_to_go'
+PUBLISH_TOPIC_INV_W     = 'my/topic/inv_w'     #not used yet. Just put path here
 KEEPALIVE_INTERVAL = 55  # seconds
 
 
